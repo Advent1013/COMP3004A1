@@ -17,7 +17,7 @@ public class BlackjackTest extends TestCase{
 		
 		//Console
 		Game.SetGameContols('c');
-		
+		assertEquals(Blackjack.GameUsingInput.Console, Game.GetGameInputMode());
 		
 		//Invalid
 		Game.SetGameContols('d');
@@ -68,7 +68,6 @@ public class BlackjackTest extends TestCase{
 		String[] File_Contents_Split = File_Contents.split("\\s+");
 		for(String Content : File_Contents_Split)
 			if(Content.length() == 2) File_Results += Content + " ";
-		
 		assertEquals(Game_File.Game_Deck.toString(),File_Results.trim());
 		
 		//Checks if decks generated at random actually generates a deck and each card is unique.

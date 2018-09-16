@@ -16,5 +16,6 @@ public class Blackjack {
 		System.out.println("Please select an input mode:\nConsole: 'c'\nRead from File: 'f'");
 		String input_mode_result = console_input.nextLine().trim().toLowerCase();
 		SetGameContols(input_mode_result.charAt(0));
+		console_input.close();
 	}
 }

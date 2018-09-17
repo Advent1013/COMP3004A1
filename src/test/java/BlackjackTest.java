@@ -4,6 +4,7 @@ import java.util.Scanner;
 public class BlackjackTest extends TestCase{
 	//Sample test file locations
 	private String ValidSampleTest_1 = "TestCases/ValidSampleTest1.txt";
+	private String ErrorDublicateCard = "TestCases/ErrorDuplicateCard.txt";
 	
 	//Testing if the game supports input mode selection.
 	public void testGameStartMode() {
@@ -52,12 +53,11 @@ public class BlackjackTest extends TestCase{
 		System.setIn(System.in);
 	}
 	
-	//Test if Deck creation works as intended
+	//Test if Deck creation works as intended.
 	public void testDeckCreation() {
-		
 		//Read deck contents from file and then manually read and compare with test sample.
 		Blackjack Game_File = new Blackjack();
-		Game_File.CreateDeckFromFile(ValidSampleTest_1);
+		assertEquals(true, Game_File.CreateDeckFromFile(ValidSampleTest_1)); //Deck creation should return true if creation ended without any issue.
 		assertEquals(null, Game_File.Game_Deck);
 		
 		//Read from file directly to endure Deck object has the same cards and maintains the order.
@@ -74,6 +74,20 @@ public class BlackjackTest extends TestCase{
 		Blackjack Game_Console = new Blackjack();
 		Game_Console.CreateDeckAtRandom();
 		assertEquals(true, Game_Console.Game_Deck.Cards.length > 0);
-		assertEquals(true, Deck.AreCardsUnique(Game_Console.Game_Deck));
+		assertEquals(true, Blackjack.Deck.AreCardsUnique(Game_Console.Game_Deck));
+		
+		Blackjack Game_Error_Duplicate_Card = new Blackjack();
+		assertEquals(false, Game_Error_Duplicate_Card.CreateDeckFromFile(ErrorDublicateCard));
+		assertEquals(null, Blackjack.Deck.AreCardsUnique(Game_Console.Game_Error_Duplicate_Card));
+	}
+	
+	//Test to see if player and dealer hands work
+	public void testPlayerandDealerHands() {
+		
+	}
+	
+	//Test to see point ranking of cards.
+	public void testCardandScores() {
+		
 	}
 }

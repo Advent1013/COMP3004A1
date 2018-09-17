@@ -64,10 +64,16 @@ public class BlackjackTest extends TestCase{
 		Scanner File_Scanner = new Scanner(ValidSampleTest_1);
 		String File_Results = "";
 		String File_Contents = File_Scanner.nextLine();
+		File_Scanner.close();
 		//Making sure to only add cards.
 		String[] File_Contents_Split = File_Contents.split("\\s+");
-		for(String Content : File_Contents_Split)
-			if(Content.length() == 2) File_Results += Content + " ";
+		for(String Content : File_Contents_Split) {
+			if(Content.length() == 2) {
+				File_Results += Content + " ";
+				assertEquals(true, Blackjack.Deck.isCardValid(Content)); //Assuming all cards in the test are valid, this should always return true for every card.
+			}
+			
+		}
 		assertEquals(Game_File.Game_Deck.toString(),File_Results.trim());
 	}
 	

@@ -2,10 +2,29 @@ import java.util.Collections.*;
 import java.util.*;
 
 public class Blackjack {
-		public static enum GameUsingInput { File, Console, Error, Undefined }
+	//Variables relating to selecting the user input mode for the game.
+	public static enum GameUsingInput { File, Console, Error, Undefined }
 	
 	private GameUsingInput GameInputMode = GameUsingInput.Undefined;
 	
+	public GameUsingInput GetGameInputMode() { return GameInputMode; }
+	
+	public void SetGameContols(char Input) { 
+		if(Input=='f') GameInputMode = GameUsingInput.File;
+		else if(Input=='c') GameInputMode = GameUsingInput.Console;
+		else GameInputMode = GameUsingInput.Error;
+	}
+	
+	public void AskUserForGameInputMode() {
+		Scanner console_input = new Scanner(System.in);
+		System.out.println("Please select an input mode:\nConsole: 'c'\nRead from File: 'f'");
+		String input_mode_result = console_input.nextLine().trim().toLowerCase();
+		SetGameContols(input_mode_result.charAt(0));
+		console_input.close();
+	}
+	
+	
+	//Deck class for which the Blackjack game will draw its cards from.
 	public static class Deck{
 		private Deque<String> Cards;
 		public Deck() {
@@ -44,24 +63,5 @@ public class Blackjack {
 	}
 	
 	public Deck Game_Deck;
-	
-	public GameUsingInput GetGameInputMode() { return GameInputMode; }
-	
-	public void SetGameContols(char Input) { 
-		if(Input=='f') GameInputMode = GameUsingInput.File;
-		else if(Input=='c') GameInputMode = GameUsingInput.Console;
-		else GameInputMode = GameUsingInput.Error;
-	}
-	
-	
-	public void AskUserForGameInputMode() {
-		Scanner console_input = new Scanner(System.in);
-		System.out.println("Please select an input mode:\nConsole: 'c'\nRead from File: 'f'");
-		String input_mode_result = console_input.nextLine().trim().toLowerCase();
-		SetGameContols(input_mode_result.charAt(0));
-		console_input.close();
-	}
-	
-	
 	
 }

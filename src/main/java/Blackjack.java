@@ -36,10 +36,11 @@ public class Blackjack {
 		//Returns true if card was valid and has been added to the deck
 		//Returns false if otherwise.
 		public boolean addCard(String Card) {
-			if(Card.length()!=2) return false;
+			if(Card.length()<2) return false;
 			Cards.push(Card);
 			return true;
 		}
+		//Outputs the contents of the deck to a string.
 		public String toString() {
 			LinkedList<String> Card_List = (LinkedList<String>) Cards;
 			String out = "";
@@ -48,6 +49,7 @@ public class Blackjack {
 			}
 			return out.trim();
 		}
+		//Ensures that each card in the deck are different.
 		public static boolean AreCardsUnique(Deck Card_Deck) {
 			LinkedList<String> Card_List = (LinkedList<String>) Card_Deck.GetCards();
 			boolean hasDuplicate = false;
@@ -60,6 +62,32 @@ public class Blackjack {
 			}
 			return hasDuplicate;
 		}
+		public static boolean IsCardValid(String Card) {
+			if(Card.length()<2) return false;
+			
+			boolean result = false;
+			char suit = Card.charAt(0);
+			
+		}
+	}
+	
+	//Adding card class to facilitate card objects and make it easier to perform calculations.
+	public static class Card{
+		//Enumerators to make handling each element of each card easier.
+		public static enum SUIT{ 
+			Spades ('S'), Clubs ('C'), Diamonds ('D'), Hearts ('H'); 
+			public char value;
+			private SUIT(char val) { value=val; }
+		}
+		public static enum RANK{ 
+			Ace("A",11), Two("2",2), Three("3",3), Four("4",4), Five("5",5), Six("6",6), Seven("7",7), Eight("8",8), Nine("9",9), Ten("10",10), Jack("J",10), Queen("Q",10), King("K",10);
+			public String Name;
+			public int Worth;
+			private RANK(String N, int W) { Name = N; Worth = W; }
+		}
+		public SUIT Suit;
+		public RANK Rank;
+		public Card(SUIT s, RANK r) { Suit = s; Rank = r; }
 	}
 	
 	public Deck Game_Deck;

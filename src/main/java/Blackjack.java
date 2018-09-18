@@ -1,4 +1,5 @@
 import java.util.Collections.*;
+import java.io.File;
 import java.util.*;
 
 public class Blackjack {
@@ -166,4 +167,7 @@ public class Blackjack {
 	
 	public Deck Game_Deck;
 	
+	public boolean CreateDeckFromFile(String Filename) {
+
+	}
 }

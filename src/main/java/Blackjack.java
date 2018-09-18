@@ -42,7 +42,8 @@ public class Blackjack {
 			Cards.addLast(new Card(card));
 			return true;
 		}
-		//Outputs the contents of the deck to a string.
+		//Outputs the contents of the deck to a string
+		@Override 
 		public String toString() {
 			LinkedList<Card> Card_List = (LinkedList<Card>) Cards;
 			String out = "";
@@ -54,15 +55,14 @@ public class Blackjack {
 		//Ensures that each card in the deck are different.
 		public static boolean AreCardsUnique(Deck Card_Deck) {
 			LinkedList<Card> Card_List = (LinkedList<Card>) Card_Deck.GetCards();
-			boolean hasDuplicate = false;
 			for(int i = 0; i < Card_List.size() - 1; i++) {
 				for(int j = i + 1; j < Card_List.size(); j++) {
-					hasDuplicate = Card_List.get(i).isEqualTo(Card_List.get(j));
-					if(hasDuplicate) break;
+					if(Card_List.get(i).isEqualTo(Card_List.get(j))) {
+						return true;
+					}
 				}
-				if(hasDuplicate) break;
 			}
-			return hasDuplicate;
+			return false;
 		}
 		//Manually ensures that a string can be converted into a card.
 		public static boolean IsCardValid(String Card) {
@@ -156,13 +156,14 @@ public class Blackjack {
 			case 'K' : Rank = RANK.King; break;
 			}
 		}
+		
+		@Override 
 		public String toString() {
 			return Suit.Value+Rank.Name;
 		}
 	    public boolean isEqualTo(Card c) {
-	    	if(this.Rank!=c.Rank) return false;
-	    	if(this.Suit!=c.Suit) return false;
-	    	return true;
+	    	if(this.Rank.equals(c.Rank)&&this.Suit.equals(c.Suit)) return true;
+	    	return false;
 	    }
 	}
 	
@@ -185,9 +186,16 @@ public class Blackjack {
 			if(Content.length() == 2) {
 				Game_Deck.addCard(Content);
 			}
-			
 		}
-		
+		if(Deck.AreCardsUnique(Game_Deck)) {
+			Game_Deck = null;
+			return false;
+		}
 		return true;
 	}
+	
+	public void CreateDeckAtRandom() {
+		
+	}
+	
 }

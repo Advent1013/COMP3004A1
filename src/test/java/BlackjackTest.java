@@ -77,10 +77,14 @@ public class BlackjackTest extends TestCase{
 				File_Results += Content + " ";
 				assertEquals(true, Blackjack.Deck.IsCardValid(Content)); //Assuming all cards in the test are valid, this should always return true for every card.
 			}
-			
 		}
-		System.out.println(Game_File.Game_Deck.toString());
 		assertEquals(Game_File.Game_Deck.toString(),File_Results.trim());
+		
+		//Checks how deck creation handles duplicate files.
+		Blackjack Game_Error_Duplicate_Card = new Blackjack();
+		assertEquals(false, Game_Error_Duplicate_Card.CreateDeckFromFile(ErrorDublicateCard));
+		assertEquals(null, Game_Error_Duplicate_Card.Game_Deck);
+		
 	}
 	
 	//Checks if decks generated at random actually generates a deck and each card is unique.	
@@ -90,9 +94,7 @@ public class BlackjackTest extends TestCase{
 		assertEquals(true, Game_Console.Game_Deck.GetCards().size() > 0);
 		assertEquals(true, Blackjack.Deck.AreCardsUnique(Game_Console.Game_Deck));
 		
-		Blackjack Game_Error_Duplicate_Card = new Blackjack();
-		assertEquals(false, Game_Error_Duplicate_Card.CreateDeckFromFile(ErrorDublicateCard));
-		assertEquals(null, Blackjack.Deck.AreCardsUnique(Game_Error_Duplicate_Card.Game_Deck));
+
 	}
 	
 	//Test to see if player and dealer hands work

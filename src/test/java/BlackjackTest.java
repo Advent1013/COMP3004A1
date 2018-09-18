@@ -70,7 +70,7 @@ public class BlackjackTest extends TestCase{
 		for(String Content : File_Contents_Split) {
 			if(Content.length() == 2) {
 				File_Results += Content + " ";
-				assertEquals(true, Blackjack.Deck.isCardValid(Content)); //Assuming all cards in the test are valid, this should always return true for every card.
+				assertEquals(true, Blackjack.Deck.IsCardValid(Content)); //Assuming all cards in the test are valid, this should always return true for every card.
 			}
 			
 		}

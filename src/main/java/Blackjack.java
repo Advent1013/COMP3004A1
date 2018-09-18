@@ -26,48 +26,82 @@ public class Blackjack {
 	
 	//Deck class for which the Blackjack game will draw its cards from.
 	public static class Deck{
-		private Deque<String> Cards;
+		private Deque<Card> Cards;
 		public Deck() {
-			Cards = new LinkedList<String>();
+			Cards = new LinkedList<Card>();
 		}
 		
-		public Deque<String> GetCards(){ return Cards; }
+		public Deque<Card> GetCards(){ return Cards; }
 		
 		//Returns true if card was valid and has been added to the deck
 		//Returns false if otherwise.
-		public boolean addCard(String Card) {
-			if(Card.length()<2) return false;
-			Cards.push(Card);
+		public boolean addCard(String card) {
+			if(!IsCardValid(card)) return false;
+			Cards.push(new Card(card));
 			return true;
 		}
 		//Outputs the contents of the deck to a string.
 		public String toString() {
-			LinkedList<String> Card_List = (LinkedList<String>) Cards;
+			LinkedList<Card> Card_List = (LinkedList<Card>) Cards;
 			String out = "";
-			for(String Card : Card_List) {
-				out += Card + " ";
+			for(Card Card : Card_List) {
+				out += Card.toString() + " ";
 			}
 			return out.trim();
 		}
 		//Ensures that each card in the deck are different.
 		public static boolean AreCardsUnique(Deck Card_Deck) {
-			LinkedList<String> Card_List = (LinkedList<String>) Card_Deck.GetCards();
+			LinkedList<Card> Card_List = (LinkedList<Card>) Card_Deck.GetCards();
 			boolean hasDuplicate = false;
 			for(int i = 0; i < Card_List.size() - 1; i++) {
 				for(int j = i + 1; j < Card_List.size(); j++) {
-					hasDuplicate = Card_List.get(i).equals(Card_List.get(j));
+					hasDuplicate = Card_List.get(i).isEqualTo(Card_List.get(j));
 					if(hasDuplicate) break;
 				}
 				if(hasDuplicate) break;
 			}
 			return hasDuplicate;
 		}
+		//Manually ensures that a string can be converted into a card.
 		public static boolean IsCardValid(String Card) {
+			Card = Card.toUpperCase();
 			if(Card.length()<2) return false;
 			
-			boolean result = false;
+			boolean SuitIsOK = false;
+			boolean RankIsOK = false;
+			
 			char suit = Card.charAt(0);
 			
+			switch(suit) {
+			case 'S' : SuitIsOK = true; break;
+			case 'C' : SuitIsOK = true; break;
+			case 'D' : SuitIsOK = true; break;
+			case 'H' : SuitIsOK = true; break;
+			}
+			
+			//Checks if card is a 10 as it is the only card with three characters.
+			if(Card.length()==3) 
+				if(Card.substring(1,2).equals("10")) RankIsOK = true;
+				else return false;
+			
+			char rank = Card.charAt(1);
+			
+			switch(rank) {
+			case 'A' : RankIsOK = true; break;
+			case '2' : RankIsOK = true; break;
+			case '3' : RankIsOK = true; break;
+			case '4' : RankIsOK = true; break;
+			case '5' : RankIsOK = true; break;
+			case '6' : RankIsOK = true; break;
+			case '7' : RankIsOK = true; break;
+			case '8' : RankIsOK = true; break;
+			case '9' : RankIsOK = true; break;
+			case 'J' : RankIsOK = true; break;
+			case 'Q' : RankIsOK = true; break;
+			case 'K' : RankIsOK = true; break;
+			}
+			
+			return SuitIsOK&&RankIsOK;
 		}
 	}
 	
@@ -76,8 +110,8 @@ public class Blackjack {
 		//Enumerators to make handling each element of each card easier.
 		public static enum SUIT{ 
 			Spades ('S'), Clubs ('C'), Diamonds ('D'), Hearts ('H'); 
-			public char value;
-			private SUIT(char val) { value=val; }
+			public char Value;
+			private SUIT(char Val) { Value=Val; }
 		}
 		public static enum RANK{ 
 			Ace("A",11), Two("2",2), Three("3",3), Four("4",4), Five("5",5), Six("6",6), Seven("7",7), Eight("8",8), Nine("9",9), Ten("10",10), Jack("J",10), Queen("Q",10), King("K",10);
@@ -88,6 +122,46 @@ public class Blackjack {
 		public SUIT Suit;
 		public RANK Rank;
 		public Card(SUIT s, RANK r) { Suit = s; Rank = r; }
+		//Create card from string using similar code to that of IsCardValid but without the error checking.
+		public Card(String Card) {
+			Card = Card.toUpperCase();
+			char suit = Card.charAt(0);
+			
+			switch(suit) {
+			case 'S' : Suit = SUIT.Spades; break;
+			case 'C' : Suit = SUIT.Clubs; break;
+			case 'D' : Suit = SUIT.Diamonds; break;
+			case 'H' : Suit = SUIT.Hearts; break;
+			}
+			
+			//Checks if card is a 10 as it is the only card with three characters.
+			if(Card.length()==3) 
+				if(Card.substring(1,2).equals("10")) Rank = RANK.Ten;
+			char rank = Card.charAt(1);
+			
+			switch(rank) {
+			case 'A' : Rank = RANK.Ace; break;
+			case '2' : Rank = RANK.Two; break;
+			case '3' : Rank = RANK.Three; break;
+			case '4' : Rank = RANK.Four; break;
+			case '5' : Rank = RANK.Five; break;
+			case '6' : Rank = RANK.Six; break;
+			case '7' : Rank = RANK.Seven; break;
+			case '8' : Rank = RANK.Eight; break;
+			case '9' : Rank = RANK.Nine; break;
+			case 'J' : Rank = RANK.Jack; break;
+			case 'Q' : Rank = RANK.Queen; break;
+			case 'K' : Rank = RANK.King; break;
+			}
+		}
+		public String toString() {
+			return Suit.Value+Rank.Name;
+		}
+	    public boolean isEqualTo(Card c) {
+	    	if(this.Rank!=c.Rank) return false;
+	    	if(this.Suit!=c.Suit) return false;
+	    	return true;
+	    }
 	}
 	
 	public Deck Game_Deck;

@@ -93,8 +93,6 @@ public class BlackjackTest extends TestCase{
 		Game_Console.CreateDeckAtRandom();
 		assertEquals(true, Game_Console.Game_Deck.GetCards().size() > 0);
 		assertEquals(true, Blackjack.Deck.AreCardsUnique(Game_Console.Game_Deck));
-		
-
 	}
 	
 	//Test to see if player and dealer hands work

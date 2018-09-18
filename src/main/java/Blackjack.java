@@ -35,6 +35,8 @@ public class Blackjack {
 		
 		public Deque<Card> GetCards(){ return Cards; }
 		
+		public void SetCards(LinkedList<Card> c) { Cards = c; }
+		
 		//Returns true if card was valid and has been added to the deck
 		//Returns false if otherwise.
 		public boolean addCard(String card) {
@@ -195,7 +197,20 @@ public class Blackjack {
 	}
 	
 	public void CreateDeckAtRandom() {
+		Card.SUIT[] Suits = Card.SUIT.values();
+		Card.RANK[] Ranks = Card.RANK.values();
+		Game_Deck = new Deck();
+		LinkedList<Card> Card_List = new LinkedList<Card>();
+		Random rand = new Random();
 		
+		for(Card.RANK Rank : Ranks) {
+			for(Card.SUIT Suit : Suits) {
+				Card card = new Card(Suit, Rank);
+				if(Card_List.size()==0) Card_List.add(card);
+				Card_List.add(rand.nextInt(Card_List.size()), card);
+			}
+		}
+		Game_Deck.SetCards(Card_List);
 	}
 	
 }

@@ -57,11 +57,16 @@ public class BlackjackTest extends TestCase{
 	public void testDeckCreationFromFile() {
 		//Read deck contents from file and then manually read and compare with test sample.
 		Blackjack Game_File = new Blackjack();
+		assertEquals(false, Game_File.CreateDeckFromFile(ValidSampleTest_1+"13adsad")); //Enusres funcion fails when invalid file name passed
 		assertEquals(true, Game_File.CreateDeckFromFile(ValidSampleTest_1)); //Deck creation should return true if creation ended without any issue.
-		assertEquals(null, Game_File.Game_Deck);
+		assertNotNull(Game_File.Game_Deck);
 		
+		File file = new File(ValidSampleTest_1);
 		//Read from file directly to endure Deck object has the same cards and maintains the order.
-		Scanner File_Scanner = new Scanner(ValidSampleTest_1);
+		Scanner File_Scanner = null;
+		try {
+			File_Scanner = new Scanner(file);
+		} catch (FileNotFoundException e) {	}
 		String File_Results = "";
 		String File_Contents = File_Scanner.nextLine();
 		File_Scanner.close();
@@ -74,6 +79,7 @@ public class BlackjackTest extends TestCase{
 			}
 			
 		}
+		System.out.println(Game_File.Game_Deck.toString());
 		assertEquals(Game_File.Game_Deck.toString(),File_Results.trim());
 	}
 	

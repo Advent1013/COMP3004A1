@@ -1,5 +1,6 @@
 import java.util.Collections.*;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.*;
 
 public class Blackjack {
@@ -38,7 +39,7 @@ public class Blackjack {
 		//Returns false if otherwise.
 		public boolean addCard(String card) {
 			if(!IsCardValid(card)) return false;
-			Cards.push(new Card(card));
+			Cards.addLast(new Card(card));
 			return true;
 		}
 		//Outputs the contents of the deck to a string.
@@ -168,6 +169,25 @@ public class Blackjack {
 	public Deck Game_Deck;
 	
 	public boolean CreateDeckFromFile(String Filename) {
-
+		File file = new File(Filename);
+		Scanner File_Scanner;
+		try {
+			File_Scanner = new Scanner(file);
+		} catch (FileNotFoundException e) {
+			return false;
+		}
+		String File_Contents = File_Scanner.nextLine();
+		File_Scanner.close();
+		
+		Game_Deck = new Deck();
+		String[] File_Contents_Split = File_Contents.split("\\s+");
+		for(String Content : File_Contents_Split) {
+			if(Content.length() == 2) {
+				Game_Deck.addCard(Content);
+			}
+			
+		}
+		
+		return true;
 	}
 }

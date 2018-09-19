@@ -169,7 +169,7 @@ public class Blackjack {
 	    }
 	}
 	
-	public Deck Game_Deck;
+	public Deck GameDeck;
 	
 	public boolean CreateDeckFromFile(String Filename) {
 		File file = new File(Filename);
@@ -182,15 +182,15 @@ public class Blackjack {
 		String File_Contents = File_Scanner.nextLine();
 		File_Scanner.close();
 		
-		Game_Deck = new Deck();
+		GameDeck = new Deck();
 		String[] File_Contents_Split = File_Contents.split("\\s+");
 		for(String Content : File_Contents_Split) {
 			if(Content.length() == 2) {
-				Game_Deck.addCard(Content);
+				GameDeck.addCard(Content);
 			}
 		}
-		if(Deck.AreCardsUnique(Game_Deck)) {
-			Game_Deck = null;
+		if(Deck.AreCardsUnique(GameDeck)) {
+			GameDeck = null;
 			return false;
 		}
 		return true;
@@ -199,7 +199,7 @@ public class Blackjack {
 	public void CreateDeckAtRandom() {
 		Card.SUIT[] Suits = Card.SUIT.values();
 		Card.RANK[] Ranks = Card.RANK.values();
-		Game_Deck = new Deck();
+		GameDeck = new Deck();
 		LinkedList<Card> Card_List = new LinkedList<Card>();
 		Random rand = new Random();
 		
@@ -210,7 +210,7 @@ public class Blackjack {
 				Card_List.add(rand.nextInt(Card_List.size()), card);
 			}
 		}
-		Game_Deck.SetCards(Card_List);
+		GameDeck.SetCards(Card_List);
 	}
 	
 }

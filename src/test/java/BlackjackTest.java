@@ -1,10 +1,15 @@
 import java.io.*;
 import junit.framework.*;
 import java.util.Scanner;
+
+import Blackjack.Card;
 public class BlackjackTest extends TestCase{
 	//Sample test file locations
-	private String ValidSampleTest_1 = "TestCases/ValidSampleTest1.txt";
+	private String ValidSampleTest1 = "TestCases/ValidSampleTest1.txt";
+	private String ValidSampleTest2 = "PlayerHitsMultipleTimesAndBusts.txt";
+	private String ValidSampleTest3 = "PlayerHitsMultipleTimesAndStandsDealerHitsTwiceAndStands.txt";
 	private String ErrorDublicateCard = "TestCases/ErrorDuplicateCard.txt";
+	
 	
 	//Testing if the game supports input mode selection.
 	public void testGameStartMode() {
@@ -56,53 +61,110 @@ public class BlackjackTest extends TestCase{
 	//Test if Deck creation works as intended.
 	public void testDeckCreationFromFile() {
 		//Read deck contents from file and then manually read and compare with test sample.
-		Blackjack Game_File = new Blackjack();
-		assertEquals(false, Game_File.CreateDeckFromFile(ValidSampleTest_1+"13adsad")); //Enusres funcion fails when invalid file name passed
-		assertEquals(true, Game_File.CreateDeckFromFile(ValidSampleTest_1)); //Deck creation should return true if creation ended without any issue.
-		assertNotNull(Game_File.Game_Deck);
+		Blackjack GameFile = new Blackjack();
+		assertEquals(false, GameFile.CreateDeckFromFile(ValidSampleTest1+"13adsad")); //Enusres funcion fails when invalid file name passed
+		assertEquals(true, GameFile.CreateDeckFromFile(ValidSampleTest1)); //Deck creation should return true if creation ended without any issue.
+		assertNotNull(GameFile.GameDeck);
 		
-		File file = new File(ValidSampleTest_1);
+		File file = new File(ValidSampleTest1);
 		//Read from file directly to endure Deck object has the same cards and maintains the order.
-		Scanner File_Scanner = null;
+		Scanner FileScanner = null;
 		try {
-			File_Scanner = new Scanner(file);
+			FileScanner = new Scanner(file);
 		} catch (FileNotFoundException e) {	}
-		String File_Results = "";
-		String File_Contents = File_Scanner.nextLine();
-		File_Scanner.close();
+		String FileResults = "";
+		String FileContents = FileScanner.nextLine();
+		FileScanner.close();
 		//Making sure to only add cards.
-		String[] File_Contents_Split = File_Contents.split("\\s+");
-		for(String Content : File_Contents_Split) {
+		String[] FileContentsSplit = FileContents.split("\\s+");
+		for(String Content : FileContentsSplit) {
 			if(Content.length() == 2) {
-				File_Results += Content + " ";
+				FileResults += Content + " ";
 				assertEquals(true, Blackjack.Deck.IsCardValid(Content)); //Assuming all cards in the test are valid, this should always return true for every card.
 			}
 		}
-		assertEquals(Game_File.Game_Deck.toString(),File_Results.trim());
+		assertEquals(GameFile.GameDeck.toString(),FileResults.trim());
 		
 		//Checks how deck creation handles duplicate files.
-		Blackjack Game_Error_Duplicate_Card = new Blackjack();
-		assertEquals(false, Game_Error_Duplicate_Card.CreateDeckFromFile(ErrorDublicateCard));
-		assertEquals(null, Game_Error_Duplicate_Card.Game_Deck);
+		Blackjack GameErrorDuplicateCard = new Blackjack();
+		assertEquals(false, GameErrorDuplicateCard.CreateDeckFromFile(ErrorDublicateCard));
+		assertEquals(null, GameErrorDuplicateCard.GameDeck);
 		
 	}
 	
 	//Checks if decks generated at random actually generates a deck and each card is unique.	
 	public void testDeckCreationAtRandom() {
-		Blackjack Game_Console = new Blackjack();
-		Game_Console.CreateDeckAtRandom();
-		assertEquals(true, Game_Console.Game_Deck.GetCards().size() > 0);
-		assertEquals(true, Blackjack.Deck.AreCardsUnique(Game_Console.Game_Deck));
-	}
-	
-	//Test to see if player and dealer hands work
-	public void testPlayerandDealerHands() {
-		
+		Blackjack GameConsole = new Blackjack();
+		GameConsole.CreateDeckAtRandom();
+		assertEquals(true, GameConsole.GameDeck.GetCards().size() > 0);
+		assertEquals(true, Blackjack.Deck.AreCardsUnique(GameConsole.GameDeck));
 	}
 	
 	//Test to see point ranking of cards.
-	public void testCardandScores() {
+	public void testCardScores() {
+		Blackjack.Hand TestHand = new Blackjack.Hand();
+		//Checking score of a single Ace and then a double Ace should be 11, and then 11+1 afterwards.
+		Hand.addCard(new Blackjack.Card(Blackjack.Card.SUIT.Clubs,Blackjack.Card.RANK.Ace));
+		AssertEquals(11,Blackjack.CalcScore(Hand));
+		Hand.addCard(new Blackjack.Card(Blackjack.Card.SUIT.Diamonds,Blackjack.Card.RANK.Ace));
+		AssertEquals(12,Blackjack.CalcScore(Hand));
+		//Checking score to see if both aces are valued as 1 each, when a ten card is added, making the score 10+1+1
+		Hand.addCard(new Blackjack.Card(Blackjack.Card.SUIT.Diamonds,Blackjack.Card.RANK.Nine));
+		AssertEquals(12,Blackjack.CalcScore(Hand));
+		
+		
+		//Testing to see if Jing Queen and Jack are worth 10 each
+		Blackjack.Hand TestHand = new Blackjack.Hand();
+		Hand.addCard(new Blackjack.Card(Blackjack.Card.SUIT.Clubs,Blackjack.Card.RANK.King));
+		AssertEquals(10,Blackjack.CalcScore(Hand));
+		
+		Hand.addCard(new Blackjack.Card(Blackjack.Card.SUIT.Clubs,Blackjack.Card.RANK.Queen));
+		AssertEquals(10,Blackjack.CalcScore(Hand));
+		
+		Hand.addCard(new Blackjack.Card(Blackjack.Card.SUIT.Clubs,Blackjack.Card.RANK.Jack));
+		AssertEquals(10,Blackjack.CalcScore(Hand));
+	}
+	
+	//Test to see if player can hit and bust.
+	public void testPlayerHitandBust() {
+		//Test player hits.
+		Blackjack GamePlayerHits = new Blackjack();
+		GamePlayerHits.SetGameContols('f');
+		GamePlayerHits.CreateDeckFromFile(ValidSampleTest2);
+		GamePlayerHits.init();
+		GamePlayerHits.NextStep();
+		//Check if step is to distribute cards.
+		assertEquals(Blackjack.GameState.DistributeCards, GamePlayerHits.CurrentState);
+		GamePlayerHits.NextStep();
+		//Check visible cards, two player cards and one dealer card
+		assertEquals(2,GamePlayerHits.Player.VisibleCards.size());
+		assertEquals(1,GamePlayerHits.Dealer.VisibleCards.size());
+		assertEquals(Blackjack.GameState.ShowHandsPlayer, GamePlayerHits.CurrentState);
+		GamePlayerHits.NextStep();
+		
+		//Player hit
+		assertEquals(Blackjack.GameState.PlayerHits, GamePlayerHits.CurrentState);
+		GamePlayerHits.NextStep();
+		
+		//Show Player turn
+		assertEquals(Blackjack.GameState.ShowPlayerHandPlayer, GamePlayerHits.CurrentState);
+		GamePlayerHits.NextStep();
+		
+		//Player hit
+		assertEquals(Blackjack.GameState.PlayerHits, GamePlayerHits.CurrentState);
+		GamePlayerHits.NextStep();
+		
+		//Player busts
+		assertEquals(Blackjack.GameState.DealerWins, GamePlayerHits.CurrentState);
+	}
+	
+	//Test to see if the player can stand and if the dealer can hit and and stand
+	public void testPlayerStandandDealerHitandStand() {
 		
 	}
 	
+	//Test to ensure winners are selected appropriately.
+	public void testWinConditions() {
+		
+	}
 }

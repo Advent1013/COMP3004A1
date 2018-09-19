@@ -137,17 +137,20 @@ public class BlackjackTest extends TestCase{
 		assertEquals(Blackjack.GameState.DistributeCards, GamePlayerHits.CurrentState);
 		GamePlayerHits.NextStep();
 		//Check visible cards, two player cards and one dealer card
-		assertEquals(2,GamePlayerHits.Player.VisibleCards);
-		assertEquals(1,GamePlayerHits.Dealer.VisibleCards);
+		assertEquals(2,GamePlayerHits.Player.VisibleCards.size());
+		assertEquals(1,GamePlayerHits.Dealer.VisibleCards.size());
 		assertEquals(Blackjack.GameState.ShowHands, GamePlayerHits.CurrentState);
 		GamePlayerHits.NextStep();
 		
+		//Player hit
 		assertEquals(Blackjack.GameState.PlayerHits, GamePlayerHits.CurrentState);
 		GamePlayerHits.NextStep();
 		
+		//Player hit
 		assertEquals(Blackjack.GameState.PlayerHits, GamePlayerHits.CurrentState);
 		GamePlayerHits.NextStep();
 		
+		//Player busts
 		assertEquals(Blackjack.GameState.DealerWins, GamePlayerHits.CurrentState);
 	}
 	
@@ -182,10 +185,11 @@ public class BlackjackTest extends TestCase{
 		GamePlayerHits.NextStep();
 		
 		assertEquals(Blackjack.GameState.DealerWins, GamePlayerHits.CurrentState);
+		GamePlayerHits.NextStep();
 	}
 	
 	//Test to ensure winners are selected appropriately.
 	public void testWinConditions() {
-		//Autoplay function will be used.
+		//Autoplay function will be used
 	}
 }

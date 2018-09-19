@@ -102,27 +102,29 @@ public class BlackjackTest extends TestCase{
 	
 	//Test to see point ranking of cards.
 	public void testCardScores() {
-		Blackjack.Hand TestHand = new Blackjack.Hand();
+		Blackjack.Hand TestAcesHand = new Blackjack.Hand();
 		//Checking score of a single Ace and then a double Ace should be 11, and then 11+1 afterwards.
-		Hand.addCard(new Blackjack.Card(Blackjack.Card.SUIT.Clubs,Blackjack.Card.RANK.Ace));
-		AssertEquals(11,Blackjack.CalcScore(Hand));
-		Hand.addCard(new Blackjack.Card(Blackjack.Card.SUIT.Diamonds,Blackjack.Card.RANK.Ace));
-		AssertEquals(12,Blackjack.CalcScore(Hand));
+		TestAcesHand.addCard(new Blackjack.Card(Blackjack.Card.SUIT.Clubs,Blackjack.Card.RANK.Ace));
+		assertEquals(11,Blackjack.CalcScore(TestAcesHand));
+		TestAcesHand.addCard(new Blackjack.Card(Blackjack.Card.SUIT.Diamonds,Blackjack.Card.RANK.Ace));
+		assertEquals(12,Blackjack.CalcScore(TestAcesHand));
 		//Checking score to see if both aces are valued as 1 each, when a ten card is added, making the score 10+1+1
-		Hand.addCard(new Blackjack.Card(Blackjack.Card.SUIT.Diamonds,Blackjack.Card.RANK.Nine));
-		AssertEquals(12,Blackjack.CalcScore(Hand));
+		TestAcesHand.addCard(new Blackjack.Card(Blackjack.Card.SUIT.Diamonds,Blackjack.Card.RANK.Ten));
+		assertEquals(12,Blackjack.CalcScore(TestAcesHand));
 		
 		
 		//Testing to see if Jing Queen and Jack are worth 10 each
-		Blackjack.Hand TestHand = new Blackjack.Hand();
-		Hand.addCard(new Blackjack.Card(Blackjack.Card.SUIT.Clubs,Blackjack.Card.RANK.King));
-		AssertEquals(10,Blackjack.CalcScore(Hand));
+		Blackjack.Hand TestTensHand = new Blackjack.Hand();
+		TestTensHand.addCard(new Blackjack.Card(Blackjack.Card.SUIT.Clubs,Blackjack.Card.RANK.King));
+		assertEquals(10,Blackjack.CalcScore(TestTensHand));
 		
-		Hand.addCard(new Blackjack.Card(Blackjack.Card.SUIT.Clubs,Blackjack.Card.RANK.Queen));
-		AssertEquals(10,Blackjack.CalcScore(Hand));
+		TestTensHand = new Blackjack.Hand();
+		TestTensHand.addCard(new Blackjack.Card(Blackjack.Card.SUIT.Clubs,Blackjack.Card.RANK.Queen));
+		assertEquals(10,Blackjack.CalcScore(TestTensHand));
 		
-		Hand.addCard(new Blackjack.Card(Blackjack.Card.SUIT.Clubs,Blackjack.Card.RANK.Jack));
-		AssertEquals(10,Blackjack.CalcScore(Hand));
+		TestTensHand = new Blackjack.Hand();
+		TestTensHand.addCard(new Blackjack.Card(Blackjack.Card.SUIT.Clubs,Blackjack.Card.RANK.Jack));
+		assertEquals(10,Blackjack.CalcScore(TestTensHand));
 	}
 	
 	//Test to see if player can hit and bust.
@@ -137,20 +139,17 @@ public class BlackjackTest extends TestCase{
 		assertEquals(Blackjack.GameState.DistributeCards, GamePlayerHits.CurrentState);
 		GamePlayerHits.NextStep();
 		//Check visible cards, two player cards and one dealer card
-		assertEquals(2,GamePlayerHits.Player.VisibleCards.size());
-		assertEquals(1,GamePlayerHits.Dealer.VisibleCards.size());
+		assertEquals(2,GamePlayerHits.PlayerHand.VisibleCards);
+		assertEquals(1,GamePlayerHits.DealerHand.VisibleCards);
 		assertEquals(Blackjack.GameState.ShowHands, GamePlayerHits.CurrentState);
 		GamePlayerHits.NextStep();
 		
-		//Player hit
 		assertEquals(Blackjack.GameState.PlayerHits, GamePlayerHits.CurrentState);
 		GamePlayerHits.NextStep();
 		
-		//Player hit
 		assertEquals(Blackjack.GameState.PlayerHits, GamePlayerHits.CurrentState);
 		GamePlayerHits.NextStep();
 		
-		//Player busts
 		assertEquals(Blackjack.GameState.DealerWins, GamePlayerHits.CurrentState);
 	}
 	
@@ -185,11 +184,10 @@ public class BlackjackTest extends TestCase{
 		GamePlayerHits.NextStep();
 		
 		assertEquals(Blackjack.GameState.DealerWins, GamePlayerHits.CurrentState);
-		GamePlayerHits.NextStep();
 	}
 	
 	//Test to ensure winners are selected appropriately.
 	public void testWinConditions() {
-		//Autoplay function will be used
+		//Autoplay function will be used.
 	}
 }

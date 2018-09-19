@@ -7,6 +7,8 @@ public class Blackjack {
 	//Variables relating to selecting the user input mode for the game.
 	public static enum GameUsingInput { File, Console, Error, Undefined }
 	
+	private String Filename;
+	
 	private GameUsingInput GameInputMode = GameUsingInput.Undefined;
 	
 	public GameUsingInput GetGameInputMode() { return GameInputMode; }
@@ -24,6 +26,7 @@ public class Blackjack {
 		SetGameContols(input_mode_result.charAt(0));
 		console_input.close();
 	}
+	
 	
 	
 	//Deck class for which the Blackjack game will draw its cards from.
@@ -172,6 +175,7 @@ public class Blackjack {
 	public Deck GameDeck;
 	
 	public boolean CreateDeckFromFile(String Filename) {
+		this.Filename = Filename;
 		File file = new File(Filename);
 		Scanner File_Scanner;
 		try {
@@ -213,4 +217,34 @@ public class Blackjack {
 		GameDeck.SetCards(Card_List);
 	}
 	
+	//Functions and variables relating to hand, player and dealer classes.
+	public static class Hand{
+		private LinkedList<Card> Cards;
+		public int VisibleCards;
+		
+		public Hand() {
+			Cards = new LinkedList<Card>();
+		}
+		
+		public void addCard(Card c) {
+			Cards.add(c);
+		}
+		
+		public LinkedList<Card> GetHand() { return Cards; }
+	}
+	
+	//Functions and variables relating to game state.
+	public static enum GameState{ GameIdle, DistributeCards, ShowHands, PlayerHits, PlayerStands, DealerHits, DealerStands, PlayerWins, DealerWins }
+	public GameState CurrentState;
+	
+	public static int CalcScore(Hand hand) {
+		int score = 0;
+		int aces = 0;
+		for(Card card : hand.GetHand()) {
+			score += card.Rank.Worth;
+			if(card.Rank==Card.RANK.Ace) aces++;
+		}
+		while(aces>0&&score>21) { score-=10; aces--; }
+		return score;
+	}
 }

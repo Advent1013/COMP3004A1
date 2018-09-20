@@ -6,6 +6,9 @@ public class BlackjackTest extends TestCase{
 	private String ValidSampleTest1 = "TestCases/ValidSampleTest1.txt";
 	private String ValidSampleTest2 = "TestCases/PlayerHitsMultipleTimesAndBusts.txt";
 	private String ValidSampleTest3 = "TestCases/PlayerHitsOnceAndDealerHitsTwice.txt";
+	private String ProfSampleTest1  = "TestCases/ProfSample1.txt";
+	private String ProfSampleTest2  = "TestCases/ProfSample2.txt";
+	private String ProfSampleTest3  = "TestCases/ProfSample3.txt";
 	private String ErrorDublicateCard = "TestCases/ErrorDuplicateCard.txt";
 	
 	
@@ -153,6 +156,32 @@ public class BlackjackTest extends TestCase{
 		GamePlayerHits.NextStep(false);
 	}
 	
+	public void testProfSamples() {
+		Blackjack ProfSample1 = new Blackjack();
+		ProfSample1.SetGameContols('f');
+		assertEquals(true, ProfSample1.CreateDeckFromFile(ProfSampleTest1));
+		ProfSample1.init();
+		assertEquals(Blackjack.GameState.GameIdle, ProfSample1.CurrentState);
+		ProfSample1.NextStep(true);
+		assertEquals(Blackjack.GameState.DealerWins, ProfSample1.CurrentState);
+		
+		Blackjack ProfSample2 = new Blackjack();
+		ProfSample2.SetGameContols('f');
+		assertEquals(true, ProfSample2.CreateDeckFromFile(ProfSampleTest2));
+		ProfSample2.init();
+		assertEquals(Blackjack.GameState.GameIdle, ProfSample2.CurrentState);
+		ProfSample2.NextStep(true);
+		assertEquals(Blackjack.GameState.PlayerWins, ProfSample2.CurrentState);
+		
+		Blackjack ProfSample3 = new Blackjack();
+		ProfSample3.SetGameContols('f');
+		assertEquals(true, ProfSample3.CreateDeckFromFile(ProfSampleTest3));
+		ProfSample3.init();
+		assertEquals(Blackjack.GameState.GameIdle, ProfSample3.CurrentState);
+		ProfSample3.NextStep(true);
+		assertEquals(Blackjack.GameState.PlayerWins, ProfSample3.CurrentState);
+	}
+	
 	//Test to see if the player can stand and if the dealer can hit and and stand
 	public void testPlayerStandandDealerHitandStand() {
 		//Test player hits.
@@ -186,9 +215,6 @@ public class BlackjackTest extends TestCase{
 		assertEquals(Blackjack.GameState.PlayerWins, GamePlayerHits.CurrentState);
 		GamePlayerHits.NextStep(false);
 	}
-	
-	//Test to ensure winners are selected appropriately.
-	public void testWinConditions() {
-		//Autoplay function will be used.
-	}
+
+
 }

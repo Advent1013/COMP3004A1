@@ -1,13 +1,11 @@
 import java.io.*;
 import junit.framework.*;
 import java.util.Scanner;
-
-import Blackjack.Card;
 public class BlackjackTest extends TestCase{
 	//Sample test file locations
 	private String ValidSampleTest1 = "TestCases/ValidSampleTest1.txt";
-	private String ValidSampleTest2 = "PlayerHitsMultipleTimesAndBusts.txt";
-	private String ValidSampleTest3 = "PlayerHitsOnceAndStandsDealerHitsTwiceAndStands.txt";
+	private String ValidSampleTest2 = "TestCases/PlayerHitsMultipleTimesAndBusts.txt";
+	private String ValidSampleTest3 = "TestCases/PlayerHitsOnceAndDealerHitsTwice.txt";
 	private String ErrorDublicateCard = "TestCases/ErrorDuplicateCard.txt";
 	
 	
@@ -78,7 +76,7 @@ public class BlackjackTest extends TestCase{
 		//Making sure to only add cards.
 		String[] FileContentsSplit = FileContents.split("\\s+");
 		for(String Content : FileContentsSplit) {
-			if(Content.length() == 2) {
+			if(Content.length() != 1) {
 				FileResults += Content + " ";
 				assertEquals(true, Blackjack.Deck.IsCardValid(Content)); //Assuming all cards in the test are valid, this should always return true for every card.
 			}
@@ -132,25 +130,27 @@ public class BlackjackTest extends TestCase{
 		//Test player hits.
 		Blackjack GamePlayerHits = new Blackjack();
 		GamePlayerHits.SetGameContols('f');
-		GamePlayerHits.CreateDeckFromFile(ValidSampleTest2);
+		assertEquals(true, GamePlayerHits.CreateDeckFromFile(ValidSampleTest2));
 		GamePlayerHits.init();
-		GamePlayerHits.NextStep();
+		assertEquals(Blackjack.GameState.GameIdle, GamePlayerHits.CurrentState);
+		GamePlayerHits.NextStep(false);
 		//Check if step is to distribute cards.
 		assertEquals(Blackjack.GameState.DistributeCards, GamePlayerHits.CurrentState);
-		GamePlayerHits.NextStep();
+		GamePlayerHits.NextStep(false);
 		//Check visible cards, two player cards and one dealer card
 		assertEquals(2,GamePlayerHits.PlayerHand.VisibleCards);
 		assertEquals(1,GamePlayerHits.DealerHand.VisibleCards);
 		assertEquals(Blackjack.GameState.ShowHands, GamePlayerHits.CurrentState);
-		GamePlayerHits.NextStep();
+		GamePlayerHits.NextStep(false);
 		
 		assertEquals(Blackjack.GameState.PlayerHits, GamePlayerHits.CurrentState);
-		GamePlayerHits.NextStep();
+		GamePlayerHits.NextStep(false);
 		
 		assertEquals(Blackjack.GameState.PlayerHits, GamePlayerHits.CurrentState);
-		GamePlayerHits.NextStep();
+		GamePlayerHits.NextStep(false);
 		
 		assertEquals(Blackjack.GameState.DealerWins, GamePlayerHits.CurrentState);
+		GamePlayerHits.NextStep(false);
 	}
 	
 	//Test to see if the player can stand and if the dealer can hit and and stand
@@ -158,32 +158,33 @@ public class BlackjackTest extends TestCase{
 		//Test player hits.
 		Blackjack GamePlayerHits = new Blackjack();
 		GamePlayerHits.SetGameContols('f');
-		GamePlayerHits.CreateDeckFromFile(ValidSampleTest3);
+		assertEquals(true, GamePlayerHits.CreateDeckFromFile(ValidSampleTest3));
 		GamePlayerHits.init();
-		GamePlayerHits.NextStep();
+		GamePlayerHits.NextStep(false);
 		//Check if step is to distribute cards.
 		assertEquals(Blackjack.GameState.DistributeCards, GamePlayerHits.CurrentState);
-		GamePlayerHits.NextStep();
+		GamePlayerHits.NextStep(false);
 		
 		assertEquals(Blackjack.GameState.ShowHands, GamePlayerHits.CurrentState);
-		GamePlayerHits.NextStep();
+		GamePlayerHits.NextStep(false);
 		
 		assertEquals(Blackjack.GameState.PlayerHits, GamePlayerHits.CurrentState);
-		GamePlayerHits.NextStep();
+		GamePlayerHits.NextStep(false);
 		
 		assertEquals(Blackjack.GameState.PlayerStands, GamePlayerHits.CurrentState);
-		GamePlayerHits.NextStep();
+		GamePlayerHits.NextStep(false);
 		
 		assertEquals(Blackjack.GameState.DealerHits, GamePlayerHits.CurrentState);
-		GamePlayerHits.NextStep();
+		GamePlayerHits.NextStep(false);
 		
 		assertEquals(Blackjack.GameState.DealerHits, GamePlayerHits.CurrentState);
-		GamePlayerHits.NextStep();
+		GamePlayerHits.NextStep(false);
 		
 		assertEquals(Blackjack.GameState.DealerStands, GamePlayerHits.CurrentState);
-		GamePlayerHits.NextStep();
+		GamePlayerHits.NextStep(false);
 		
-		assertEquals(Blackjack.GameState.DealerWins, GamePlayerHits.CurrentState);
+		assertEquals(Blackjack.GameState.PlayerWins, GamePlayerHits.CurrentState);
+		GamePlayerHits.NextStep(false);
 	}
 	
 	//Test to ensure winners are selected appropriately.

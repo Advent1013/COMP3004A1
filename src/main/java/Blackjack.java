@@ -6,25 +6,32 @@ import java.util.*;
 public class Blackjack {
 	//Variables relating to selecting the user input mode for the game.
 	public static enum GameUsingInput { File, Console, Error, Undefined }
-	
-	private String Filename;
+	Scanner console_input;
 	
 	private GameUsingInput GameInputMode = GameUsingInput.Undefined;
 	
 	public GameUsingInput GetGameInputMode() { return GameInputMode; }
 	
 	public void SetGameContols(char Input) { 
-		if(Input=='f') GameInputMode = GameUsingInput.File;
-		else if(Input=='c') GameInputMode = GameUsingInput.Console;
-		else GameInputMode = GameUsingInput.Error;
+		if(Input=='f') {
+			GameInputMode = GameUsingInput.File;
+			System.out.println("File input mode selected.\n");
+		}
+		else if(Input=='c') {
+			GameInputMode = GameUsingInput.Console;
+			System.out.println("Console input mode selected.\n");
+		}
+		else {
+			GameInputMode = GameUsingInput.Error;
+			System.out.println("Invalid input mode!\n");
+		}
 	}
 	
 	public void AskUserForGameInputMode() {
-		Scanner console_input = new Scanner(System.in);
-		System.out.println("Please select an input mode:\nConsole: 'c'\nRead from File: 'f'");
+		if(console_input==null) console_input = new Scanner(System.in);
+		System.out.println("Please select an input mode:\nConsole: 'c'\nRead from File: 'f'\n");
 		String input_mode_result = console_input.nextLine().trim().toLowerCase();
 		SetGameContols(input_mode_result.charAt(0));
-		console_input.close();
 	}
 	
 	
@@ -42,10 +49,18 @@ public class Blackjack {
 		
 		//Returns true if card was valid and has been added to the deck
 		//Returns false if otherwise.
-		public boolean addCard(String card) {
+		public boolean AddCard(String card) {
 			if(!IsCardValid(card)) return false;
 			Cards.addLast(new Card(card));
 			return true;
+		}
+		
+		public Card DrawCard() {
+			if(Cards.size()==0) {
+				System.out.println("Error! The deck is empty!");
+				System.exit(1);
+			}
+			return Cards.removeFirst();
 		}
 		//Outputs the contents of the deck to a string
 		@Override 
@@ -88,7 +103,7 @@ public class Blackjack {
 			
 			//Checks if card is a 10 as it is the only card with three characters.
 			if(Card.length()==3) 
-				if(Card.substring(1,2).equals("10")) RankIsOK = true;
+				if(Card.substring(1,3).equals("10")) RankIsOK = true;
 				else return false;
 			
 			char rank = Card.charAt(1);
@@ -143,7 +158,7 @@ public class Blackjack {
 			
 			//Checks if card is a 10 as it is the only card with three characters.
 			if(Card.length()==3) 
-				if(Card.substring(1,2).equals("10")) Rank = RANK.Ten;
+				if(Card.substring(1,3).equals("10")) Rank = RANK.Ten;
 			char rank = Card.charAt(1);
 			
 			switch(rank) {
@@ -175,12 +190,13 @@ public class Blackjack {
 	public Deck GameDeck;
 	
 	public boolean CreateDeckFromFile(String Filename) {
-		this.Filename = Filename;
+		EventQueue = new LinkedList<Event>();
 		File file = new File(Filename);
 		Scanner File_Scanner;
 		try {
 			File_Scanner = new Scanner(file);
 		} catch (FileNotFoundException e) {
+			System.out.println("File could not be found\n");
 			return false;
 		}
 		String File_Contents = File_Scanner.nextLine();
@@ -189,8 +205,16 @@ public class Blackjack {
 		GameDeck = new Deck();
 		String[] File_Contents_Split = File_Contents.split("\\s+");
 		for(String Content : File_Contents_Split) {
-			if(Content.length() == 2) {
-				GameDeck.addCard(Content);
+			if(Content.length() == 1) {
+				char action = Content.charAt(0);
+				switch(action) {
+				case 'H' : EventQueue.add(Event.Hit); break;
+				case 'S' : EventQueue.add(Event.Stand); break;
+				}
+			}
+			else {
+				GameDeck.AddCard(Content);
+				EventQueue.add(Event.Card);
 			}
 		}
 		if(Deck.AreCardsUnique(GameDeck)) {
@@ -231,11 +255,24 @@ public class Blackjack {
 		}
 		
 		public LinkedList<Card> GetHand() { return Cards; }
+		
+		@Override
+		public String toString() {
+			String out = "";
+			for(int i = 0; (i < VisibleCards) && (i < Cards.size()); i++) {
+				out += Cards.get(i).toString() + " ";
+			}
+			return out.trim();
+		}
 	}
 	
 	//Functions and variables relating to game state.
 	public static enum GameState{ GameIdle, DistributeCards, ShowHands, PlayerHits, PlayerStands, DealerHits, DealerStands, PlayerWins, DealerWins }
+	public static enum Event{ Card, Hit, Stand, Split }
 	public GameState CurrentState;
+	public Queue<Event> EventQueue;
+	private boolean PlayerTurn;
+	private boolean GameEnd;
 	
 	public static int CalcScore(Hand hand) {
 		int score = 0;
@@ -246,5 +283,168 @@ public class Blackjack {
 		}
 		while(aces>0&&score>21) { score-=10; aces--; }
 		return score;
+	}
+	
+	public Hand PlayerHand;
+	public Hand DealerHand;
+	
+	public void init() {
+		CurrentState = GameState.GameIdle;
+	}
+
+	public GameState DetermineWinner() {
+		if(CalcScore(PlayerHand)>21) return GameState.DealerWins;
+		if(CalcScore(DealerHand)>21) return GameState.PlayerWins;
+		if(CalcScore(DealerHand)==21) return GameState.DealerWins;
+		if(CalcScore(PlayerHand)==21) return GameState.PlayerWins;
+		if(GameEnd) {
+			if(CalcScore(PlayerHand)>CalcScore(DealerHand)) return GameState.PlayerWins; 
+			else return GameState.DealerWins;
+		}
+		return null;
+	}
+	
+	public GameState EvaluateNextState() {
+		GameState PotentialWinner = DetermineWinner();
+		if(PotentialWinner!=null) return PotentialWinner;
+
+		if(!PlayerTurn) {
+			if(CalcScore(DealerHand)<17) return GameState.DealerHits;
+			else if(CalcScore(DealerHand)==17) {
+				for(Card card : DealerHand.GetHand()) {
+					if(card.Rank==Card.RANK.Ace) {
+						return GameState.DealerHits;
+					}
+				}
+			}
+			return GameState.DealerStands;
+				
+		}
+		if(GameInputMode==GameUsingInput.Console) {
+			System.out.println("Please select an Action:\nHit: 'h'\nStand: 's'\nSplit: 'Unsupported'\n");
+			String Action_result = console_input.nextLine().trim().toLowerCase();
+			char Action = Action_result.charAt(0);
+			if(Action=='h') {
+				return GameState.PlayerHits;
+			}
+			else if(Action=='s') {
+				return GameState.PlayerStands;
+			}
+			else {
+				System.out.println("Invalid Action!");
+				System.exit(1);
+			}
+			return null;
+		}
+		else {
+			Event e = EventQueue.remove();
+			switch(e){
+			case Hit : return GameState.PlayerHits;
+			case Stand : return GameState.PlayerStands;
+			default:
+				break;
+			}
+			return null;
+		}
+	}
+	
+	public void NextStep(boolean recursive) {
+		switch(CurrentState){
+		case GameIdle:
+			PlayerHand = new Hand();
+			DealerHand = new Hand();
+			PlayerTurn = true;
+			GameEnd = false;
+			
+			CurrentState = GameState.DistributeCards;
+			System.out.println("----------------------------------------------------");
+			System.out.println("Blackjack game has begun.\n");
+			if(recursive) NextStep(recursive);
+			break;
+			
+		case DistributeCards:
+			PlayerHand.addCard(GameDeck.DrawCard());
+			if(GameInputMode == GameUsingInput.File) EventQueue.remove();
+			PlayerHand.addCard(GameDeck.DrawCard());
+			if(GameInputMode == GameUsingInput.File) EventQueue.remove();
+			DealerHand.addCard(GameDeck.DrawCard());
+			if(GameInputMode == GameUsingInput.File) EventQueue.remove();
+			DealerHand.addCard(GameDeck.DrawCard());
+			if(GameInputMode == GameUsingInput.File) EventQueue.remove();
+			DealerHand.VisibleCards = 1;
+			PlayerHand.VisibleCards = 2;
+			CurrentState = GameState.ShowHands;
+			if(recursive) NextStep(recursive);
+			break;
+			
+		case ShowHands: 
+			System.out.println("Visible player cards: " + PlayerHand.toString() + " with a score of " + CalcScore(PlayerHand));
+			System.out.println("Visible dealer cards: " + DealerHand.toString() + " with a score of " + CalcScore(DealerHand));
+			System.out.println("");
+			CurrentState = EvaluateNextState();
+			if(recursive) NextStep(recursive);
+			break;
+			
+		case PlayerHits: 
+			System.out.println("Player hits!");
+			PlayerHand.addCard(GameDeck.DrawCard());
+			if(GameInputMode == GameUsingInput.File) EventQueue.remove();
+			PlayerHand.VisibleCards++;
+			System.out.println("Your current hand is: " + PlayerHand.toString() + " with a score of " + CalcScore(PlayerHand));
+			CurrentState = EvaluateNextState();
+			if(recursive) NextStep(recursive);
+			break;
+		case PlayerStands: 
+			System.out.println("Player Stands!");
+			PlayerTurn = false;
+			CurrentState = EvaluateNextState();
+			if(recursive) NextStep(recursive);
+			break;
+		case DealerHits: 
+			System.out.println("Dealer hits!");
+			DealerHand.addCard(GameDeck.DrawCard());
+			CurrentState = EvaluateNextState();
+			if(GameInputMode == GameUsingInput.File) EventQueue.remove();
+			if(recursive) NextStep(recursive);
+			break;
+		case DealerStands: 
+			System.out.println("Dealer Stands!");
+			GameEnd = true;
+			CurrentState = EvaluateNextState();
+			if(recursive) NextStep(recursive);
+			break;
+		case PlayerWins: 
+			DealerHand.VisibleCards = 52;
+			System.out.println("The Player Wins!!");
+			System.out.println("Player cards: " + PlayerHand.toString() + " with a score of " + CalcScore(PlayerHand));
+			System.out.println("Dealer cards: " + DealerHand.toString() + " with a score of " + CalcScore(DealerHand));
+			System.out.println("----------------------------------------------------");
+			break;
+		case DealerWins: 
+			DealerHand.VisibleCards = 52;
+			System.out.println("The Dealer Wins!!");
+			System.out.println("Player cards: " + PlayerHand.toString() + " with a score of " + CalcScore(PlayerHand));
+			System.out.println("Dealer cards: " + DealerHand.toString() + " with a score of " + CalcScore(DealerHand));
+			System.out.println("----------------------------------------------------");
+			break;
+		}
+	}
+	
+	public void run() {
+		console_input = new Scanner(System.in);
+		AskUserForGameInputMode();
+		if(GameInputMode == GameUsingInput.File) {
+			
+			System.out.println("Please enter the filename:");
+			String Filename = console_input.nextLine();
+			
+			CreateDeckFromFile(Filename);
+		}
+		else {
+			CreateDeckAtRandom();
+		}
+		init();
+		NextStep(true);
+		console_input.close();
 	}
 }
